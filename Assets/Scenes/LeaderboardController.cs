@@ -1,175 +1,117 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEditor.Timeline.Actions;
-using UnityEngine.UIElements;
-
+using Random = UnityEngine.Random;
 
 public class LeaderboardController : MonoBehaviour //, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     public GameObject leaderboardRow;
-    //[SerializeField] private int totalRows = 10;
+
     private GameObject go;
-    private float y = 1.0f;
 
-    private Camera mainCamera;
-
-    //int head = 0;
+    //private float y = 1.0f;
 
     public TextAsset highscores;
 
-
     public ScrollRect scrollingRect;
-    
-    
-    
+/*
+    private float planeHeight, viewPortHeight, topPixels;
 
-    /*
-    #region Child Components
+    int elementHeight = 100;
+    int spacingHeight = 10;
 
-    [SerializeField] ScrollRect ScrollRect;
-    [SerializeField] RectTransform viewPortT;
-    [SerializeField] RectTransform DragDetectionT;
-    [SerializeField] RectTransform ContentT;
-    //[SerializeField] ListViewItemPool ItemPool;
-
-    #endregion
-    
-    #region Layout Parameters
-
-    [SerializeField] float ItemHeight = 1;      // TODO: Replace it with dynamic height
-    [SerializeField] int BufferSize;
-
-    #endregion
+    private int leadingHiddenCount, visibleCount, topPadding;*/
 
 
-
-    #region Layout Variables
-
-    int TargetVisibleItemCount { get { return Mathf.Max(Mathf.CeilToInt(viewPortT.rect.height / ItemHeight), 0); } }
-    int TopItemOutOfView { get { return Mathf.CeilToInt(ContentT.anchoredPosition.y / ItemHeight); } }
-
-    float dragDetectionAnchorPreviousY = 0;
-
-    #endregion
-
-
-
-    #region Data
-
-    ListViewItemModel[] data;
-    int dataHead = 0;
-    int dataTail = 0;
-
-    #endregion
-    
-     public void Setup(ListViewItemModel[] data)
+    public struct LeaderboardCells
     {
-        ScrollRect.onValueChanged.AddListener(OnDragDetectionPositionChange);
+        public string rank;
+        public string name;
+        public string score;
 
-        this.data = data;
-
-        DragDetectionT.sizeDelta = new Vector2(DragDetectionT.sizeDelta.x, this.data.Length * ItemHeight);
-
-        for(int i = 0; i < TargetVisibleItemCount + BufferSize; i++)
+        public LeaderboardCells(string r, string n, string s)
         {
-            GameObject itemGO = ItemBorrow();
-            itemGO.transform.SetParent(ContentT);
-            itemGO.SetActive(true);
-            itemGO.transform.localScale = Vector3.one;
-            itemGO.GetComponent<ListViewItem>().Setup(data[dataTail]);
-            dataTail++;
+            rank = r;
+            name = n;
+            score = s;
         }
     }
 
+    public RecyclingListView theList;
+    private List<LeaderboardCells> data = new List<LeaderboardCells>();
 
-
-    #region UI Event Handling
-
-    public void OnDragDetectionPositionChange(Vector2 dragNormalizePos)
+    private void Start()
     {
-        float dragDelta = DragDetectionT.anchoredPosition.y - dragDetectionAnchorPreviousY;
+        theList.ItemCallback = PopulateItem;
 
-        ContentT.anchoredPosition = new Vector2(ContentT.anchoredPosition.x, ContentT.anchoredPosition.y + dragDelta);
+        RetrieveData();
 
-        UpdateContentBuffer();
-
-        dragDetectionAnchorPreviousY = DragDetectionT.anchoredPosition.y;
+        // This will resize the list and cause callbacks to PopulateItem for
+        // items that are needed for the view
+        theList.RowCount = data.Count;
     }
 
-
-    public void OnBeginDrag(PointerEventData eventData)
+    private void RetrieveData()
     {
-        dragDetectionAnchorPreviousY = DragDetectionT.anchoredPosition.y;
-    }
+        data.Clear();
+        int row = 0;
 
-    public void OnDrag(PointerEventData eventData)
-    {
+        // You'd obviously load real data here
+        HighScores highscoresInJson = JsonUtility.FromJson<HighScores>(highscores.text);
 
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-
-    }
-
-    #endregion
-
-
-
-    #region Infinite Scroll Mechanism
-
-    void UpdateContentBuffer()
-    {
-        if(TopItemOutOfView > BufferSize)
+        foreach (HighScore highscore in highscoresInJson.highscores)        
         {
-            if(dataTail >= data.Length)
-            {
-                return;
-            }
-
-            Transform firstChildT = ContentT.GetChild(0);
-            firstChildT.SetSiblingIndex(ContentT.childCount - 1);
-            firstChildT.gameObject.GetComponent<ListViewItem>().Setup(data[dataTail]);
-            ContentT.anchoredPosition = new Vector2(ContentT.anchoredPosition.x, ContentT.anchoredPosition.y - firstChildT.gameObject.GetComponent<ListViewItem>().ItemHeight);
-            dataHead++;
-            dataTail++;
-        }
-        else if(TopItemOutOfView < BufferSize)
-        {
-            if(dataHead <= 0)
-            {
-                return;
-            }
-
-            Transform lastChildT = ContentT.GetChild(ContentT.childCount - 1);
-            lastChildT.SetSiblingIndex(0);
-            dataHead--;
-            dataTail--;
-            lastChildT.gameObject.GetComponent<ListViewItem>().Setup(data[dataHead]);
-            ContentT.anchoredPosition = new Vector2(ContentT.anchoredPosition.x, ContentT.anchoredPosition.y + lastChildT.gameObject.GetComponent<ListViewItem>().ItemHeight);
-
+            data.Add(new LeaderboardCells(highscore.rank.ToString(),highscore.name,highscore.score.ToString()));
         }
     }
 
-    #endregion
-*/
-
-
-    private void OnEnable()
+    private void PopulateItem(RecyclingListViewItem item, int rowIndex)
     {
-        //head = 0;
+        var child = item as LeaderboardRow;
+        //ChildData is a LeaderboardRow type. You're trying to assign something from data which is a list that holds LeaderboardCells. They're incompatible types
+        child.ChildData = data[rowIndex];
+    }
 
-        //PoolManager.InitializePool(leaderboardRow, 100, false);
+/*
+    private void Awake()
+    {
+        
+    }
+
+    void OnEnable()
+    {
+        scrollingRect.onValueChanged.AddListener(ListenerMethod);
+    }
+
+    public void ListenerMethod(Vector2 value)
+    {
+        
+        HighScores highscoresInJson = JsonUtility.FromJson<HighScores>(highscores.text);
+
+        
+        
+        planeHeight = scrollingRect.GetComponent<RectTransform>().rect.height;
+        viewPortHeight = scrollingRect.viewport.rect.height;
+        topPixels = scrollingRect.verticalNormalizedPosition * planeHeight;
+
+        leadingHiddenCount = Mathf.FloorToInt(topPixels / (elementHeight + spacingHeight));
+        visibleCount = Mathf.CeilToInt(viewPortHeight / (elementHeight + spacingHeight));
 
 
-        HighScores playersInJson = JsonUtility.FromJson<HighScores>(highscores.text);
+        // first Y position of visible element
+        topPadding = leadingHiddenCount * (elementHeight + spacingHeight);
+        
 
-        foreach (HighScore player in playersInJson.highscores)
+        
+        
+        //foreach (HighScore highscore in highscoresInJson.highscores)
+        //{
+        for (int i = 0; i < 10; i++)
         {
-            go = PoolManager.Instantiate(leaderboardRow);
+            go = PoolManager.Instantiate(leaderboardRow); //, pos, Quaternion.identity);
+            //necessary for proper alignment of go on canvas
             go.transform.SetParent(transform, false);
 
             //spawning in a line of y axis with spacing
@@ -177,16 +119,35 @@ public class LeaderboardController : MonoBehaviour //, IDragHandler, IBeginDragH
             go.transform.Translate(0f, currentPos - y, 0f);
             y += 0.5f;
 
-            go.transform.GetChild(0).GetComponent<Text>().text = player.rank.ToString();
-            go.transform.GetChild(1).GetComponent<Text>().text = player.name;
-            go.transform.GetChild(2).GetComponent<Text>().text = player.score.ToString();
+            //adding json values
+            go.transform.GetChild(0).GetComponent<Text>().text = highscoresInJson.highscores[i].rank.ToString();
+            go.transform.GetChild(1).GetComponent<Text>().text = highscoresInJson.highscores[i].name;
+            go.transform.GetChild(2).GetComponent<Text>().text = highscoresInJson.highscores[i].score.ToString();
         }
-        
+
+        if (value.y > 0.5f)
+        {
+           
+            PoolManager.Destroy(go);
+        }
+        /*
+ for (var k = 0; k < visibleCount; k++)
+            {
+                var j = leadingHiddenCount + k;
+                if (j > highscoresInJson.highscores.Length) break;
+                
+                //AddAnElement(highscoresInJson.highscores[j], topPadding + j * (elementHeight + spacingHeight));
+            }
+     */
+    //}
+    //PoolManager.Destroy(go);
+
+    /*
         var planeHeight = scrollingRect.GetComponent<RectTransform>().rect.height;
         var viewPortHeight = scrollingRect.viewport.rect.height;
 
         var topPixels = scrollingRect.verticalNormalizedPosition * planeHeight;
-        
+
         var elementHeight = 100;
         var spacingHeight = 10;
         var leadingHiddenCount = Mathf.FloorToInt(topPixels / (elementHeight + spacingHeight));
@@ -194,54 +155,23 @@ public class LeaderboardController : MonoBehaviour //, IDragHandler, IBeginDragH
         // first Y position of visible element
         var topPadding = leadingHiddenCount * (elementHeight + spacingHeight);
 
-        for (var i = 0; i < visibleCount; i++) {
+
+
+        for (var i = 0; i < visibleCount; i++)
+        {
             var j = leadingHiddenCount + i;
-            if (j > playersInJson.highscores.Length) break;
-            add(playersInJson.highscores[j], topPadding + j * (elementHeight + spacingHeight));
+            if (j > highscoresInJson.highscores.Length) break;
+            
+            Vector3 pos = transform.position; // get a copy
+
+            pos.x = 0;
+            pos.y = topPadding + j * (elementHeight + spacingHeight);
+            pos.z = 0;
+
+            transform.position = pos; // now put it back and override the vector3 with the new one.
+
+            //AddAnElement(highscoresInJson.highscores[j], topPadding + j * (elementHeight + spacingHeight));
         }
-        //PoolManager.Destroy(go);
-    }
-
-
-/*
-public GameObject ItemBorrow()
-{
-    if(head >= totalRows) {
-        return null;
-    }
-
-    head++;
-    return this.transform.GetChild(0).gameObject;
-}
-
-public void ItemReturn(GameObject go)
-{
-    if(head <= 0) {
-        return;
-    }
-
-    head--;
-    PoolManager.Destroy(go);
-    go.transform.SetParent(this.transform);
-}
 */
-    private void OnDisable()
-    {
-    }
-
-    private void Awake()
-    {
-        mainCamera = Camera.main;
-    }
-
-// Update is called once per frame
-    void Update()
-    {
-        /*
-                Vector2 screenPosition = mainCamera.WorldToScreenPoint(transform.position);
-                if (screenPosition.y > Screen.height || screenPosition.y < 0)
-                {
-                    PoolManager.Destroy(go);
-                }*/
-    }
+    
 }

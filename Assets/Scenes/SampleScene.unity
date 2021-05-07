@@ -210,7 +210,7 @@ GameObject:
   - component: {fileID: 248519730}
   - component: {fileID: 248519729}
   m_Layer: 5
-  m_Name: Text
+  m_Name: rank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -627,8 +627,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leaderboardRow: {fileID: 2131984588}
-  totalRows: 100
   highscores: {fileID: 4900000, guid: 7ceb73387b363b791bdcb8bc250cad57, type: 3}
+  scrollingRect: {fileID: 654166068}
+  theList: {fileID: 0}
 --- !u!114 &654166068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -797,7 +798,7 @@ GameObject:
   - component: {fileID: 1810536247}
   - component: {fileID: 1810536246}
   m_Layer: 5
-  m_Name: Text (2)
+  m_Name: score
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -946,7 +947,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 154742874}
   m_HandleRect: {fileID: 154742873}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1002,7 +1003,7 @@ GameObject:
   - component: {fileID: 1918141617}
   - component: {fileID: 1918141616}
   m_Layer: 5
-  m_Name: Text (1)
+  m_Name: name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1178,6 +1179,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2131984589}
+  - component: {fileID: 2131984590}
   m_Layer: 5
   m_Name: LeaderboardRow
   m_TagString: Untagged
@@ -1207,3 +1209,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2131984590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2131984588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bc919558ed76d1e8886652683265399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rank: {fileID: 248519729}
+  name: {fileID: 1918141616}
+  score: {fileID: 1810536246}

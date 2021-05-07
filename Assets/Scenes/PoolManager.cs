@@ -11,8 +11,8 @@ public static class PoolManager
     private readonly static Dictionary<GameObject, KeyValuePair<Pool, LinkedListNode<GameObject>>> nodes =
         new Dictionary<GameObject, KeyValuePair<Pool, LinkedListNode<GameObject>>>();
 
-    public static int globalPoolSize = 20;
-    public static int globalNetPoolSize = 30;
+    public static int globalPoolSize = 10;
+    public static int globalNetPoolSize = 100;
 
     /// <summary>
     /// Instantiate a gameobject into the pool transform and other stuff needs to be set via script
