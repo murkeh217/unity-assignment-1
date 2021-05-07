@@ -7,15 +7,15 @@ using Random = UnityEngine.Random;
 
 public class LeaderboardController : MonoBehaviour //, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    public GameObject leaderboardRow;
+    //private GameObject leaderboardRow;
 
-    private GameObject go;
+    //private GameObject go;
 
     //private float y = 1.0f;
 
     public TextAsset highscores;
 
-    public ScrollRect scrollingRect;
+//    private ScrollRect scrollingRect;
 /*
     private float planeHeight, viewPortHeight, topPixels;
 
@@ -40,6 +40,7 @@ public class LeaderboardController : MonoBehaviour //, IDragHandler, IBeginDragH
     }
 
     public RecyclingListView theList;
+    
     private List<LeaderboardCells> data = new List<LeaderboardCells>();
 
     private void Start()
@@ -56,7 +57,7 @@ public class LeaderboardController : MonoBehaviour //, IDragHandler, IBeginDragH
     private void RetrieveData()
     {
         data.Clear();
-        int row = 0;
+        var row = 0;
 
         // You'd obviously load real data here
         HighScores highscoresInJson = JsonUtility.FromJson<HighScores>(highscores.text);

@@ -201,7 +201,7 @@ public class RecyclingListView : MonoBehaviour {
 
             for (int i = 0; i < childItems.Length; ++i) {
                 if (childItems[i] == null) {
-                    childItems[i] = Instantiate(ChildPrefab);
+                        childItems[i] = Instantiate(ChildPrefab);
                 }
                 childItems[i].RectTransform.SetParent(scrollRect.content, false);
                 childItems[i].gameObject.SetActive(false);
